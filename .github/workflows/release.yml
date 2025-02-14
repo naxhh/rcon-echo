@@ -29,14 +29,7 @@ jobs:
 
       - name: Package the binary
         run: |
-          BINARY_NAME=$(basename $(pwd))
-          ls
-          echo ----------
-          ls -lah target/
-          echo ----------
-          ls -lah target/release
-          echo ----------
-          ls -lah target/${{ matrix.target }}
+          BINARY_NAME=rcon-echo
 
           if [[ "${{ matrix.target }}" == *"windows"* ]]; then
             cp target/${{ matrix.target }}/release/$BINARY_NAME.exe release/$BINARY_NAME-${{ matrix.target }}.exe
