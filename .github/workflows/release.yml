@@ -1,8 +1,9 @@
 name: Release
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - "v*.*.*"
 
 jobs:
   build:
@@ -18,10 +19,8 @@ jobs:
       - name: Build the project
         run: cargo build --release
 
-      - name: Upload binaries as release assets
-        uses: actions/upload-release-asset@v1
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
         with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./target/release/rcon-echo
-          asset_name: rcon-echo-linux
-          asset_content_type: application/octet-stream
+          files: ./target/release/rcon-echo
