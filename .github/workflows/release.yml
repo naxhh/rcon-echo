@@ -29,15 +29,14 @@ jobs:
 
       - name: Package the binary
         run: |
-          mkdir -p release
           BINARY_NAME=$(basename $(pwd))
           ls
           echo ----------
-          ls target/
+          ls -lah target/
           echo ----------
-          echo target/${{ matrix.target }}
+          ls -lah target/release
           echo ----------
-          echo target/${{ matrix.target }}/release
+          ls -lah target/${{ matrix.target }}
 
           if [[ "${{ matrix.target }}" == *"windows"* ]]; then
             cp target/${{ matrix.target }}/release/$BINARY_NAME.exe release/$BINARY_NAME-${{ matrix.target }}.exe
