@@ -1,7 +1,7 @@
+use bytes::{BufMut, BytesMut};
+use std::error::Error;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpListener;
-use bytes::{BytesMut, BufMut};
-use std::error::Error;
 
 #[derive(Debug)]
 struct RconPacket {
@@ -36,7 +36,7 @@ impl RconPacket {
             return Err("Invalid packet size".into());
         }
 
-        let size = i32::from_le_bytes([data[0], data[1], data[2], data[3]]);
+        let _size = i32::from_le_bytes([data[0], data[1], data[2], data[3]]);
         let id = i32::from_le_bytes([data[4], data[5], data[6], data[7]]);
         let r#type = i32::from_le_bytes([data[8], data[9], data[10], data[11]]);
         let body = String::from_utf8(data[12..data.len() - 2].to_vec())?;
@@ -45,7 +45,10 @@ impl RconPacket {
     }
 }
 
-async fn handle_client(mut socket: tokio::net::TcpStream, password: String) -> Result<(), Box<dyn Error>> {
+async fn handle_client(
+    mut socket: tokio::net::TcpStream,
+    password: String,
+) -> Result<(), Box<dyn Error>> {
     let mut buffer = [0; 4096];
     let mut authenticated = false;
 
@@ -58,7 +61,8 @@ async fn handle_client(mut socket: tokio::net::TcpStream, password: String) -> R
         let packet = RconPacket::deserialize(&buffer[..n])?;
 
         match packet.r#type {
-            3 if !authenticated => { // Auth packet
+            3 if !authenticated => {
+                // Auth packet
                 if packet.body == password {
                     authenticated = true;
                     let response = RconPacket::new(packet.id, 2, "".to_string()); // Auth response
@@ -69,7 +73,8 @@ async fn handle_client(mut socket: tokio::net::TcpStream, password: String) -> R
                     break;
                 }
             }
-            2 if authenticated => { // Command packet
+            2 if authenticated => {
+                // Command packet
                 println!("Received command: {}", packet.body);
                 let response = RconPacket::new(packet.id, 2, "".to_string()); // Command response
                 socket.write_all(&response.serialize()).await?;
