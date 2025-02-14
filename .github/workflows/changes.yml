@@ -1,7 +1,10 @@
 name: "Test Suite"
 on:
   push:
-  pull_request:
+    branches:
+      - '**'        # Trigger on all branches
+    tags-ignore:
+      - '**'        # Ignore all tags
 
 jobs:
   test:
