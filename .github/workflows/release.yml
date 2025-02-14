@@ -12,7 +12,6 @@ jobs:
       matrix:
         target:
           - x86_64-unknown-linux-gnu
-          - x86_64-pc-windows-msvc
           - x86_64-apple-darwin
     steps:
       - name: Checkout code
@@ -31,17 +30,43 @@ jobs:
         run: |
           mkdir -p release
           BINARY_NAME=rcon-echo
+          cp target/${{ matrix.target }}/release/$BINARY_NAME.exe release/$BINARY_NAME-${{ matrix.target }}.exe
 
-          if [[ "${{ matrix.target }}" == *"windows"* ]]; then
-            cp target/${{ matrix.target }}/release/$BINARY_NAME.exe release/$BINARY_NAME-${{ matrix.target }}.exe
-          else
-            cp target/${{ matrix.target }}/release/$BINARY_NAME release/$BINARY_NAME-${{ matrix.target }}
-          fi
 
       - name: Upload binaries as release assets
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./release/$BINARY_NAME-${{ matrix.target }}$(if [[ "${{ matrix.target }}" == *"windows"* ]]; then echo .exe; fi)
-          asset_name: $BINARY_NAME-${{ matrix.target }}$(if [[ "${{ matrix.target }}" == *"windows"* ]]; then echo .exe; fi)
+          asset_path: ./release/$BINARY_NAME-${{ matrix.target }}
+          asset_name: $BINARY_NAME-${{ matrix.target }}
+          asset_content_type: application/octet-stream
+
+  build-windows:
+    name: Build Windows binaries
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+
+      - name: Add target
+        run: rustup target add x86_64-pc-windows-msvc
+
+      - name: Build the project
+        run: cargo build --release --target x86_64-pc-windows-msvc
+
+      - name: Package the binary
+        run: |
+          mkdir -p release
+          BINARY_NAME=rcon-echo
+          cp target/x86_64-pc-windows-msvc/release/$BINARY_NAME.exe release/$BINARY_NAME-x86_64-pc-windows-msvc.exe
+
+      - name: Upload binaries as release assets
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./release/$BINARY_NAME-x86_64-pc-windows-msvc.exe
+          asset_name: $BINARY_NAME-x86_64-pc-windows-msvc.exe
           asset_content_type: application/octet-stream
