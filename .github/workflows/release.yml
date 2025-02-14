@@ -30,8 +30,7 @@ jobs:
         run: |
           mkdir -p release
           BINARY_NAME=rcon-echo
-          cp target/${{ matrix.target }}/release/$BINARY_NAME.exe release/$BINARY_NAME-${{ matrix.target }}.exe
-
+          cp target/${{ matrix.target }}/release/$BINARY_NAME release/$BINARY_NAME-${{ matrix.target }}
 
       - name: Upload binaries as release assets
         uses: actions/upload-release-asset@v1
