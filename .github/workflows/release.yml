@@ -32,7 +32,13 @@ jobs:
           mkdir -p release
           BINARY_NAME=$(basename $(pwd))
           ls
+          echo ----------
           ls target/
+          echo ----------
+          echo target/${{ matrix.target }}
+          echo ----------
+          echo target/${{ matrix.target }}/release
+
           if [[ "${{ matrix.target }}" == *"windows"* ]]; then
             cp target/${{ matrix.target }}/release/$BINARY_NAME.exe release/$BINARY_NAME-${{ matrix.target }}.exe
           else
